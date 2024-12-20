@@ -1,0 +1,17 @@
+[package]
+name = "circlenetic-wgpu-rs"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "circlenetic_wgpu_rs"
+path = "src/lib.rs"
+
+[[bin]]
+name = "circlentic-wgpu-rs"
+path = "src/main.rs"
+
+
+[dependencies]
+futures = "0.3.31"
+wgpu = "23.0.1"
