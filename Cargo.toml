@@ -3,15 +3,14 @@ name = "circlenetic-wgpu-rs"
 version = "0.1.0"
 edition = "2021"
 
-[lib]
-name = "circlenetic_wgpu_rs"
-path = "src/lib.rs"
-
 [[bin]]
-name = "circlentic-wgpu-rs"
+name = "circlenetic-wgpu-rs"  # Fixed typo here
 path = "src/main.rs"
 
-
 [dependencies]
-futures = "0.3.31"
-wgpu = "23.0.1"
+burn = { version = "0.15.0", features = ["wgpu", "autodiff"] }
+wgpu = "0.19"
+futures = "0.3"
+rand = "0.8"
+bytemuck = { version = "1.14", features = ["derive"] }
+tokio = { version = "1.28", features = ["full"] }
