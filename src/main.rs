@@ -36,8 +36,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Initializing WebGPU runtime...");
     let runtime: Runtime = Runtime::new();
 
-    // Initialize the WebGPU backend
-    println!("Initializing WebGPU device...");
+    // Get the available adapters
+    let adapters = runtime.get_adapters();
+    println!("Available adapters: {:?}", adapters);
+
+    // Get the available devices
+    let devices = runtime.get_devices();
+    println!("Available devices: {:?}", devices);
+
+    // Get the available queues
+    let queues = runtime.get_queues();
+    println!("Available queues: {:?}", queues);
+
+    // Obtain the available WgpuDevice
+    println!("Obtaining available WgpuDevice...");
 
     //TODO: change to use runtime to get available WgpuDevice.from(device)
     // let device = WgpuDevice::default();
