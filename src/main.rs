@@ -4,6 +4,8 @@ use burn::module::Module;
 use burn::nn::{Linear, LinearConfig};
 use burn::tensor::activation::relu;  // Changed import path
 
+use circlenetic_wgpu_rs::{Runtime, WgpuRuntime};
+
 type MyBackend = Wgpu;
 
 #[derive(Module, Debug, Clone)]
@@ -29,22 +31,35 @@ impl SimpleNet {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+
+    // Initialize the runtime
+    println!("Initializing WebGPU runtime...");
+    let runtime: Runtime = Runtime::new();
+
     // Initialize the WebGPU backend
     println!("Initializing WebGPU device...");
-    let device = WgpuDevice::default();
+
+    //TODO: change to use runtime to get available WgpuDevice.from(device)
+    // let device = WgpuDevice::default();
+    let (index, wgpu_device) = match runtime.get_available_wgpudevice() {
+        Some((index, device)) => (index, device),
+        None => return Err("No available device found".into()),
+    };
+    println!("Device index: {}", index);
     
     println!("Creating model...");
-    let model = SimpleNet::new(&device);
+    let model = SimpleNet::new(&wgpu_device);
 
     // Create a sample input tensor
     println!("Creating input tensor...");
     let input: Tensor<MyBackend, 2> = Tensor::random(
         [1, 784],
         burn::tensor::Distribution::Normal(0.0, 1.0),
-        &device,
+        &wgpu_device,
     );
-
     println!("Input shape: {:?}", input.shape());
+
+    println!("Input data: {:?}", input.clone().into_data().to_vec::<f32>().unwrap());
     
     println!("Running forward pass...");
     let output = model.forward(input);

@@ -1,10 +1,10 @@
 # circlenetic-wgpu-rs
 
-A lightweight Rust wrapper for wgpu that provides a simplified runtime management system for WebGPU operations.
+A lightweight Rust wrapper for wgpu that provides a simplified runtime management system for WebGPU operations, with support for burn machine learning operations.
 
 ## Overview
 
-circlenetic-wgpu-rs is a Rust library that abstracts the initialization and management of wgpu resources. It provides a clean interface for handling WebGPU instances, adapters, devices, and queues.
+circlenetic-wgpu-rs is a Rust library that abstracts the initialization and management of wgpu resources. It provides a clean interface for handling WebGPU instances, adapters, devices, and queues, with special support for burn neural network operations.
 
 ## Features
 
@@ -13,6 +13,8 @@ circlenetic-wgpu-rs is a Rust library that abstracts the initialization and mana
 - Safe wrapper around wgpu core functionality
 - Simple trait-based interface
 - Support for all wgpu backends
+- Integration with burn for neural network operations
+- Automatic WebGPU device selection for ML workloads
 
 ## Installation
 
@@ -21,10 +23,13 @@ Add this to your `Cargo.toml`:
 ```toml
 [dependencies]
 circlenetic-wgpu-rs = "0.1.0"
+burn = { version = "0.15.0", features = ["wgpu", "autodiff"] }
+wgpu = "0.19"
 ```
 
 # Usage
 
+## Basic Runtime Usage
 Here's a basic example of how to use the runtime:
 
 ```rust
@@ -34,13 +39,34 @@ fn main() {
     // Create a new runtime instance
     let runtime = Runtime::new();
     
-    // Access GPU resources
-    let instance = runtime.get_instance();
-    let adapters = runtime.get_adapters();
-    let devices = runtime.get_devices();
-    let queues = runtime.get_queues();
+    // Get an available WebGPU device
+    if let Some((index, wgpu_device)) = runtime.get_available_wgpudevice() {
+        println!("Found GPU device at index: {}", index);
+        // Use the device for computations...
+    }
+}
+```
+
+## Neural Network Example
+
+```rust
+use burn::backend::wgpu::{Wgpu, WgpuDevice};
+use burn::tensor::Tensor;
+use circlenetic_wgpu_rs::{Runtime, WgpuRuntime};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Initialize WebGPU runtime
+    let runtime: Runtime = Runtime::new();
     
-    // Work with the GPU resources...
+    // Get available WebGPU device
+    let (index, wgpu_device) = runtime.get_available_wgpudevice()
+        .ok_or("No available device found")?;
+    
+    // Create and use your neural network model
+    let model = SimpleNet::new(&wgpu_device);
+    // ... perform neural network operations
+    Ok(())
 }
 ```
 
@@ -57,22 +83,25 @@ pub trait WgpuRuntime {
     fn get_adapters(&self) -> &Vec<wgpu::Adapter>;
     fn get_devices(&self) -> &Vec<wgpu::Device>;
     fn get_queues(&self) -> &Vec<wgpu::Queue>;
+    fn get_available_wgpudevice(&self) -> Option<(usize, WgpuDevice)>;
 }
 ```
 
 ## Runtime Struct
 
-The concrete implementation that provides GPU resource management:
-Automatically initializes wgpu instance
-Discovers available GPU adapters
-Creates devices and command queues
-Provides access to all GPU resources
+The concrete implementation that provides:
+ - Automatic wgpu instance initialization
+ - GPU adapter discovery
+ - Device and queue management
+ - WebGPU device selection for burn operations
+ - Polling and maintenance of GPU devices
 
 # Requirements
 
  - Rust 1.x
  - wgpu compatible GPU
  - Compatible graphics drivers
+ - For neural network operations: GPU with compute capabilities
 
 # License
 

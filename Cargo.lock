@@ -727,9 +727,7 @@ name = "circlenetic-wgpu-rs"
 version = "0.1.0"
 dependencies = [
  "burn",
- "bytemuck",
  "futures",
- "rand",
  "tokio",
  "wgpu 0.19.4",
 ]
@@ -2853,9 +2851,9 @@ dependencies = [
 
 [[package]]
 name = "object"
-version = "0.36.6"
+version = "0.36.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08dde84f120894086dbb40c7a0257f76fdc72b6f52cdb56c2b5121b2f81b0c83"
+checksum = "62948e14d923ea95ea2c7c86c71013138b66525b86bdc08d2dcc262bdb497b87"
 dependencies = [
  "memchr",
 ]
