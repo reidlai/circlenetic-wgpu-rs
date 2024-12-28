@@ -53,11 +53,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     //TODO: change to use runtime to get available WgpuDevice.from(device)
     // let device = WgpuDevice::default();
-    let (index, wgpu_device) = match runtime.get_available_wgpudevice() {
-        Some((index, device)) => (index, device),
+    let device_id = match runtime.get_available_deviceid() {
+        Some(index) => index,
         None => return Err("No available device found".into()),
     };
-    println!("Device index: {}", index);
+    println!("Device index: {}", device_id);
+
+    let wgpu_device = WgpuDevice::DiscreteGpu(device_id);
     
     println!("Creating model...");
     let model = SimpleNet::new(&wgpu_device);
