@@ -9,6 +9,16 @@ path = "src/main.rs"
 
 [dependencies]
 burn = { version = "0.15.0", features = ["wgpu", "autodiff"] }
-wgpu = "0.19"
+# wgpu = "0.19"
+wgpu = "23.0.1"
 futures = "0.3"
 tokio = { version = "1.28", features = ["full"] }
+
+[toolchain]
+channel = "stable"  # You can specify "stable", "beta", "nightly", or a specific version like "1.56.0"
+components = ["rustfmt", "clippy"]  # Optional: Specify additional components
+targets = [
+    "x86_64-apple-darwin",  # macOS
+    "x86_64-unknown-linux-gnu",  # Linux
+    "x86_64-pc-windows-msvc"  # Windows
+]

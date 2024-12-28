@@ -1,7 +1,6 @@
 use std::fmt;
 use wgpu;
 use futures::executor::block_on;
-use burn::backend::wgpu::WgpuDevice;
 
 pub trait WgpuRuntime {
     fn new() -> Self;
@@ -9,7 +8,7 @@ pub trait WgpuRuntime {
     fn get_adapters(&self) -> &Vec<wgpu::Adapter>;
     fn get_devices(&self) -> &Vec<wgpu::Device>;
     fn get_queues(&self) -> &Vec<wgpu::Queue>;
-    fn get_available_wgpudevice(&self) -> Option<(usize, WgpuDevice)>;
+    fn get_available_deviceid(&self) -> Option<usize>;
 }
 
 #[derive(Debug)]
@@ -42,6 +41,7 @@ impl WgpuRuntime for Runtime {
                         label: None,
                         required_features: wgpu::Features::empty(),
                         required_limits: wgpu::Limits::default(),
+                        memory_hints: wgpu::MemoryHints::default(),
                     },
                     None,
                 ).await {
@@ -77,13 +77,12 @@ impl WgpuRuntime for Runtime {
         &self.queues
     }
 
-    fn get_available_wgpudevice(&self) -> Option<(usize, WgpuDevice)> {
+    fn get_available_deviceid(&self) -> Option<usize> {
 
         for (i, _adapter) in self.adapters.iter().enumerate() {
             let device = &self.devices[i];
             device.poll(wgpu::Maintain::Wait);
-            let wgpu_device = WgpuDevice::DiscreteGpu(i);
-            return Some((i, wgpu_device));
+            return Some(i);
         }
         None
         
