@@ -9,7 +9,8 @@ path = "src/main.rs"
 
 [dependencies]
 burn = { version = "0.15.0", features = ["wgpu", "autodiff"] }
-wgpu = "0.19"
+# wgpu = "0.19"
+wgpu = "23.0.1"
 futures = "0.3"
 tokio = { version = "1.28", features = ["full"] }
 
