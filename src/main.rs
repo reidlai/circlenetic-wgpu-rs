@@ -1,87 +1,51 @@
-use burn::backend::wgpu::{Wgpu, WgpuDevice};
-use burn::tensor::Tensor;
-use burn::module::Module;
-use burn::nn::{Linear, LinearConfig};
-use burn::tensor::activation::relu;  // Changed import path
+use std::process::Command;
 
-use circlenetic_wgpu_rs::{Runtime, WgpuRuntime};
+fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    
+    // If no arguments, show help
+    if args.len() <= 1 {
+        print_help();
+        return;
+    }
 
-type MyBackend = Wgpu;
-
-#[derive(Module, Debug, Clone)]
-struct SimpleNet {
-    layer1: Linear<MyBackend>,
-    layer2: Linear<MyBackend>,
-}
-
-impl SimpleNet {
-    pub fn new(device: &WgpuDevice) -> Self {
-        Self {
-            layer1: LinearConfig::new(784, 128).init(device),
-            layer2: LinearConfig::new(128, 10).init(device),
+    // Check for --example=nn-example format
+    if let Some(arg) = args.get(1) {
+        if arg.starts_with("--example=") {
+            let example = arg.trim_start_matches("--example=");
+            run_example(example);
+            return;
         }
     }
 
-    pub fn forward(&self, x: Tensor<MyBackend, 2>) -> Tensor<MyBackend, 2> {
-        let x = self.layer1.forward(x);
-        let x = relu(x);  // Changed from ReLU::new().forward(x)
-        self.layer2.forward(x)
-    }
+    // If arguments exist but not in correct format, show help
+    print_help();
 }
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn print_help() {
+    println!("WGPU examples and utilities");
+    println!("\nUsage: cargo run --example=<name>");
+    println!("\nAvailable examples:");
+    println!("  --example=nn-example    Run the neural network example");
+}
 
-    // Initialize the runtime
-    println!("Initializing WebGPU runtime...");
-    let runtime: Runtime = Runtime::new();
+fn run_example(name: &str) {
+    match name {
+        "nn-example" => {
+            // Run the example as a separate process
+            let status = Command::new("cargo")
+                .args(["run", "--example", "nn-example"])
+                .status()
+                .expect("Failed to execute example");
 
-    // Get the available adapters
-    let adapters = runtime.get_adapters();
-    println!("Available adapters: {:?}", adapters);
-
-    // Get the available devices
-    let devices = runtime.get_devices();
-    println!("Available devices: {:?}", devices);
-
-    // Get the available queues
-    let queues = runtime.get_queues();
-    println!("Available queues: {:?}", queues);
-
-    // Obtain the available WgpuDevice
-    println!("Obtaining available WgpuDevice...");
-
-    //TODO: change to use runtime to get available WgpuDevice.from(device)
-    // let device = WgpuDevice::default();
-    let device_id = match runtime.get_available_deviceid() {
-        Some(index) => index,
-        None => return Err("No available device found".into()),
-    };
-    println!("Device index: {}", device_id);
-
-    let wgpu_device = WgpuDevice::DiscreteGpu(device_id);
-    
-    println!("Creating model...");
-    let model = SimpleNet::new(&wgpu_device);
-
-    // Create a sample input tensor
-    println!("Creating input tensor...");
-    let input: Tensor<MyBackend, 2> = Tensor::random(
-        [1, 784],
-        burn::tensor::Distribution::Normal(0.0, 1.0),
-        &wgpu_device,
-    );
-    println!("Input shape: {:?}", input.shape());
-
-    println!("Input data: {:?}", input.clone().into_data().to_vec::<f32>().unwrap());
-    
-    println!("Running forward pass...");
-    let output = model.forward(input);
-
-    // Print results
-    println!("Output shape: {:?}", output.shape());
-    let output_data = output.into_data();
-    let output_vec: Vec<f32> = output_data.to_vec().unwrap();
-    println!("Output data: {:?}", output_vec);
-    Ok(())
+            if !status.success() {
+                eprintln!("Example failed to run");
+                std::process::exit(1);
+            }
+        }
+        _ => {
+            println!("Unknown example: {}", name);
+            print_help();
+        }
+    }
 }
