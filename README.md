@@ -22,9 +22,11 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-circlenetic-wgpu-rs = "0.1.0"
+circlenetic-wgpu-rs = { git = "https://github.com/yourusername/circlenetic-wgpu-rs", branch = "main" }
+# Or for a specific version/tag:
+# circlenetic-wgpu-rs = { git = "https://github.com/yourusername/circlenetic-wgpu-rs", tag = "v0.1.0" }
 burn = { version = "0.15.0", features = ["wgpu", "autodiff"] }
-wgpu = "0.19"
+wgpu = "23.0.1"
 ```
 
 # Usage
