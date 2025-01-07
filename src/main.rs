@@ -9,7 +9,7 @@ fn main() {
         return;
     }
 
-    // Check for --example=nn-example format
+    // Check for --example=webgpu-example format
     if let Some(arg) = args.get(1) {
         if arg.starts_with("--example=") {
             let example = arg.trim_start_matches("--example=");
@@ -26,15 +26,16 @@ fn print_help() {
     println!("WGPU examples and utilities");
     println!("\nUsage: cargo run --example=<name>");
     println!("\nAvailable examples:");
-    println!("  --example=nn-example    Run the neural network example");
+    println!("  --example=webgpu-example    Run the WebGPU example");
+    println!("  --example=ndarray-example   Run the CPU-based Ndarray example");
 }
 
 fn run_example(name: &str) {
     match name {
-        "nn-example" => {
+        "webgpu-example" => {
             // Run the example as a separate process
             let status = Command::new("cargo")
-                .args(["run", "--example", "nn-example"])
+                .args(["run", "--example", "webgpu-example"])
                 .status()
                 .expect("Failed to execute example");
 
@@ -43,9 +44,22 @@ fn run_example(name: &str) {
                 std::process::exit(1);
             }
         }
+        "ndarray-example" => {
+            // Run the example as a separate process
+            let status = Command::new("cargo")
+                .args(["run", "--example", "ndarray-example"])
+                .status()
+                .expect("Failed to execute example");
+            
+            if !status.success() {
+                eprintln!("Example failed to run");
+                std::process::exit(1);
+            }
+        }
         _ => {
-            println!("Unknown example: {}", name);
+            eprintln!("Unknown example: {}", name);
             print_help();
+            std::process::exit(1);
         }
     }
 }
