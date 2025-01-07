@@ -1,0 +1,8 @@
+[toolchain]
+channel = "stable"  # You can specify "stable", "beta", "nightly", or a specific version like "1.56.0"
+components = ["rustfmt", "clippy"]  # Optional: Specify additional components
+targets = [
+    "x86_64-apple-darwin",  # macOS
+    "x86_64-unknown-linux-gnu",  # Linux
+    "x86_64-pc-windows-msvc"  # Windows
+]
