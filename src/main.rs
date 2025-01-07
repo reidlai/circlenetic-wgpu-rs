@@ -57,9 +57,17 @@ fn run_example(name: &str) {
             }
         }
         _ => {
-            eprintln!("Unknown example: {}", name);
-            print_help();
-            std::process::exit(1);
+            println!("Unknown example: {}", name);
+            std::process::exit(0);
         }
     }
+}
+
+fn get_available_device_id() -> Option<usize> {
+    for (i, adapter) in self.adapters.iter().enumerate() {
+        let device = &self.devices[i];
+        device.poll(wgpu::Maintain::Wait);
+        return Some(i);
+    }
+    None
 }
