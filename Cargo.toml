@@ -19,5 +19,5 @@ path = "src/examples/ndarray-example/main.rs"
 burn = { version = "0.15.0", features = ["wgpu", "ndarray", "autodiff"] }
 wgpu = "23.0.1"
 futures = "0.3"
-tokio = { version = "1.28", features = ["full"] }
+tokio = { version = "1.43", features = ["full"] }
 clap = { version = "4.4", features = ["derive"] }
